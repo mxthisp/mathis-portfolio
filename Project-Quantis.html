@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quantis Assistant — Mathis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: #0c0c0c; color: #D7E2EA; font-family: 'Kanit', sans-serif; overflow-x: clip; }
+
+    .hero-heading {
+      background: linear-gradient(180deg, #e5e7eb 0%, #22c55e 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(32px); } to { opacity:1; transform:translateY(0); } }
+    .fade { opacity: 0; animation: fadeUp .7s cubic-bezier(.25,.1,.25,1) forwards; }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image: linear-gradient(rgba(34,197,94,.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(34,197,94,.03) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    .orb { position:fixed; border-radius:50%; pointer-events:none; z-index:0; filter:blur(100px); }
+    section, nav, footer { position:relative; z-index:1; }
+
+    .chip {
+      display:inline-flex;align-items:center;gap:6px;
+      background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);
+      border-radius:9999px;padding:4px 14px;
+      font-size:clamp(.7rem,.9vw,.85rem);font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:#22c55e;
+    }
+
+    .tech-tag {
+      background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);
+      border-radius:8px;padding:6px 14px;
+      font-size:clamp(.7rem,.85vw,.8rem);font-weight:400;letter-spacing:.06em;color:rgba(229,231,235,.8);
+      font-family: monospace;
+    }
+
+    .feature-card {
+      background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;padding:clamp(20px,2vw,32px);
+      transition:border-color .3s,background .3s;
+    }
+    .feature-card:hover { border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.04); }
+
+    .stat-card {
+      background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;padding:clamp(20px,2vw,32px);text-align:center;
+    }
+
+    /* Terminal block */
+    .terminal {
+      background:#111;border:1px solid rgba(34,197,94,.2);border-radius:12px;
+      padding:clamp(16px,2vw,28px);font-family:monospace;font-size:clamp(.75rem,1.1vw,.95rem);
+      line-height:1.9;
+    }
+    .terminal .g { color: #22c55e; }
+    .terminal .b { color: #60a5fa; }
+    .terminal .d { color: rgba(229,231,235,.5); }
+
+    img { display:block;width:100%;object-fit:cover; }
+  </style>
+  <script src="project-images.js"></script>
+</head>
+<body>
+
+<div class="orb" style="width:450px;height:450px;background:rgba(34,197,94,.07);top:-100px;left:50%;transform:translateX(-50%);"></div>
+<div class="orb" style="width:350px;height:350px;background:rgba(255,255,255,.04);bottom:-50px;right:-80px;"></div>
+
+<!-- NAV -->
+<nav style="display:flex;justify-content:space-between;align-items:center;padding:clamp(16px,2vw,28px) clamp(20px,4vw,60px);border-bottom:1px solid rgba(255,255,255,.06);">
+  <a href="Portfolio.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:#D7E2EA;font-weight:500;font-size:clamp(.8rem,1.2vw,1rem);text-transform:uppercase;letter-spacing:.1em;opacity:.7;transition:opacity .2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.7'">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg>
+    Retour
+  </a>
+  <span style="font-weight:700;font-size:clamp(.85rem,1.2vw,1rem);text-transform:uppercase;letter-spacing:.12em;opacity:.5;">Mathis — Portfolio</span>
+  <a href="Portfolio.html#contact" style="text-decoration:none;background:linear-gradient(123deg,#010A1F,#0044FF,#00BFFF,#6B21A8);border-radius:9999px;color:white;font-family:Kanit,sans-serif;font-weight:500;text-transform:uppercase;letter-spacing:.12em;font-size:clamp(.7rem,.85vw,.85rem);padding:8px 24px;">Contact</a>
+</nav>
+
+<!-- HERO -->
+<header style="padding:clamp(60px,8vw,120px) clamp(20px,4vw,60px) clamp(40px,5vw,80px);">
+  <div class="fade" style="animation-delay:.05s;margin-bottom:20px;">
+    <span class="chip">Client · 2025</span>
+  </div>
+  <h1 class="hero-heading fade" style="font-weight:900;text-transform:uppercase;letter-spacing:-.02em;line-height:1;font-size:clamp(3rem,10vw,120px);animation-delay:.1s;">
+    Quantis<br/>Assistant
+  </h1>
+  <p class="fade" style="margin-top:clamp(16px,2vw,28px);max-width:560px;font-weight:300;line-height:1.7;font-size:clamp(.9rem,1.4vw,1.15rem);opacity:.7;animation-delay:.2s;">
+    Assistant IA conversationnel spécialisé en analyse financière et comptable, capable d'interpréter bilans, rapports et données marché en langage naturel.
+  </p>
+
+  <!-- Terminal preview -->
+  <div class="fade terminal" style="max-width:520px;margin-top:clamp(32px,4vw,56px);animation-delay:.35s;">
+    <div class="d">quantis-assistant v2.4.1</div>
+    <div class="d">─────────────────────────</div>
+    <div><span class="b">Vous &gt;</span> Analyse le bilan Q3 2024</div>
+    <div style="height:8px;"></div>
+    <div><span class="g">AI   &gt;</span> Résultats nets en hausse de +18%</div>
+    <div><span class="g">     </span> EBITDA : 2.4M€ (+12% YoY)</div>
+    <div><span class="g">     </span> Recommandation : <span style="color:#f59e0b;">ACHETER</span> ▲</div>
+    <div style="height:8px;"></div>
+    <div><span class="b">$ </span><span style="animation:blink 1s step-end infinite;">█</span></div>
+  </div>
+  <style>@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}</style>
+
+  <!-- Stats -->
+  <div class="fade" style="display:flex;gap:clamp(12px,2vw,24px);flex-wrap:wrap;margin-top:clamp(36px,4vw,56px);animation-delay:.4s;">
+    <div class="stat-card" style="flex:1;min-width:140px;">
+      <div style="font-size:clamp(1.8rem,4vw,3.5rem);font-weight:900;color:#e5e7eb;">128k</div>
+      <div style="font-size:clamp(.75rem,.9vw,.85rem);text-transform:uppercase;letter-spacing:.1em;opacity:.5;margin-top:4px;">Tokens Context</div>
+    </div>
+    <div class="stat-card" style="flex:1;min-width:140px;">
+      <div style="font-size:clamp(1.8rem,4vw,3.5rem);font-weight:900;color:#e5e7eb;">&lt;2s</div>
+      <div style="font-size:clamp(.75rem,.9vw,.85rem);text-transform:uppercase;letter-spacing:.1em;opacity:.5;margin-top:4px;">Réponse Moy.</div>
+    </div>
+    <div class="stat-card" style="flex:1;min-width:140px;">
+      <div style="font-size:clamp(1.8rem,4vw,3.5rem);font-weight:900;color:#22c55e;">94%</div>
+      <div style="font-size:clamp(.75rem,.9vw,.85rem);text-transform:uppercase;letter-spacing:.1em;opacity:.5;margin-top:4px;">Satisfaction</div>
+    </div>
+    <div class="stat-card" style="flex:1;min-width:140px;">
+      <div style="font-size:clamp(1.8rem,4vw,3.5rem);font-weight:900;color:#e5e7eb;">50k+</div>
+      <div style="font-size:clamp(.75rem,.9vw,.85rem);text-transform:uppercase;letter-spacing:.1em;opacity:.5;margin-top:4px;">Analyses / mois</div>
+    </div>
+  </div>
+</header>
+
+<!-- IMAGES -->
+<section style="padding:0 clamp(20px,4vw,60px) clamp(40px,5vw,80px);">
+  <div class="fade" style="animation-delay:.35s;display:grid;grid-template-columns:1fr 1fr;gap:clamp(10px,1.5vw,20px);">
+    <img id="img-p3-main" alt="Quantis terminal" style="grid-column:1/3;border-radius:20px;max-height:500px;"/>
+    <img id="img-p3-code" alt="Quantis code" style="border-radius:16px;max-height:240px;"/>
+    <img id="img-p3-tree" alt="Quantis architecture" style="border-radius:16px;max-height:240px;"/>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section style="padding:clamp(40px,5vw,80px) clamp(20px,4vw,60px);">
+  <div style="max-width:900px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,5vw,80px);align-items:start;" class="responsive-grid">
+    <div class="fade" style="animation-delay:.1s;">
+      <h2 style="font-weight:900;text-transform:uppercase;font-size:clamp(1.8rem,3.5vw,3rem);letter-spacing:-.01em;margin-bottom:clamp(16px,2vw,24px);">Le Projet</h2>
+      <p style="font-weight:300;line-height:1.8;font-size:clamp(.85rem,1.3vw,1.05rem);opacity:.7;margin-bottom:16px;">
+        Quantis Assistant a été développé pour une société de gestion patrimoniale afin de démocratiser l'accès à l'analyse financière approfondie au sein de leurs équipes.
+      </p>
+      <p style="font-weight:300;line-height:1.8;font-size:clamp(.85rem,1.3vw,1.05rem);opacity:.7;">
+        Fine-tuné sur des milliers de rapports financiers et normes comptables (IFRS, GAAP), l'assistant interprète en langage naturel bilans, comptes de résultat, flux de trésorerie et données marché en temps réel.
+      </p>
+    </div>
+    <div class="fade" style="animation-delay:.2s;">
+      <h3 style="font-weight:700;text-transform:uppercase;font-size:clamp(1rem,1.5vw,1.2rem);letter-spacing:.08em;margin-bottom:clamp(12px,1.5vw,20px);opacity:.6;">Technologies</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <span class="tech-tag">Python</span><span class="tech-tag">GPT-4o</span>
+        <span class="tech-tag">Fine-tuning</span><span class="tech-tag">LangChain</span>
+        <span class="tech-tag">FastAPI</span><span class="tech-tag">Chroma DB</span>
+        <span class="tech-tag">React</span><span class="tech-tag">WebSockets</span>
+        <span class="tech-tag">Bloomberg API</span><span class="tech-tag">PDF Parse</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section style="padding:clamp(40px,5vw,80px) clamp(20px,4vw,60px);">
+  <div style="max-width:900px;margin:0 auto;">
+    <h2 class="fade" style="font-weight:900;text-transform:uppercase;font-size:clamp(1.8rem,3.5vw,3rem);letter-spacing:-.01em;margin-bottom:clamp(28px,3vw,48px);animation-delay:.1s;">Fonctionnalités</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:clamp(12px,1.5vw,20px);">
+      <div class="feature-card fade" style="animation-delay:.15s;">
+        <div style="font-size:1.8rem;margin-bottom:12px;">📄</div>
+        <h4 style="font-weight:700;font-size:clamp(.95rem,1.3vw,1.1rem);margin-bottom:8px;">Analyse PDF</h4>
+        <p style="font-weight:300;opacity:.6;font-size:clamp(.8rem,1.1vw,.95rem);line-height:1.6;">Extraction et interprétation automatique de rapports financiers en PDF, bilans et présentations IR.</p>
+      </div>
+      <div class="feature-card fade" style="animation-delay:.2s;">
+        <div style="font-size:1.8rem;margin-bottom:12px;">📈</div>
+        <h4 style="font-weight:700;font-size:clamp(.95rem,1.3vw,1.1rem);margin-bottom:8px;">Données Marché Live</h4>
+        <p style="font-weight:300;opacity:.6;font-size:clamp(.8rem,1.1vw,.95rem);line-height:1.6;">Connexion Bloomberg & Yahoo Finance pour contextualiser les analyses avec les données marché en temps réel.</p>
+      </div>
+      <div class="feature-card fade" style="animation-delay:.25s;">
+        <div style="font-size:1.8rem;margin-bottom:12px;">💬</div>
+        <h4 style="font-weight:700;font-size:clamp(.95rem,1.3vw,1.1rem);margin-bottom:8px;">Chat Multi-tour</h4>
+        <p style="font-weight:300;opacity:.6;font-size:clamp(.8rem,1.1vw,.95rem);line-height:1.6;">Conversations contextuelles longues (128k tokens) avec mémoire des échanges précédents et drill-down interactif.</p>
+      </div>
+      <div class="feature-card fade" style="animation-delay:.3s;">
+        <div style="font-size:1.8rem;margin-bottom:12px;">🔐</div>
+        <h4 style="font-weight:700;font-size:clamp(.95rem,1.3vw,1.1rem);margin-bottom:8px;">Compliance AMF</h4>
+        <p style="font-weight:300;opacity:.6;font-size:clamp(.8rem,1.1vw,.95rem);line-height:1.6;">Filtres de conformité intégrés, disclaimer automatique et traçabilité complète des recommandations générées.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section style="padding:clamp(60px,8vw,120px) clamp(20px,4vw,60px);text-align:center;">
+  <h2 class="hero-heading fade" style="font-weight:900;text-transform:uppercase;font-size:clamp(2rem,6vw,72px);letter-spacing:-.02em;margin-bottom:24px;animation-delay:.1s;">Un assistant IA sur mesure ?</h2>
+  <p class="fade" style="opacity:.6;font-weight:300;font-size:clamp(.9rem,1.4vw,1.1rem);margin-bottom:36px;animation-delay:.2s;">Créons votre solution ensemble</p>
+  <div class="fade" style="animation-delay:.3s;">
+    <a href="Portfolio.html#contact" style="text-decoration:none;display:inline-block;background:linear-gradient(123deg,#010A1F,#0044FF,#00BFFF,#6B21A8);box-shadow:0 4px 4px rgba(0,68,255,.25),inset 4px 4px 12px #0044FF;outline:2px solid white;outline-offset:-3px;border-radius:9999px;color:white;font-family:Kanit,sans-serif;font-weight:500;text-transform:uppercase;letter-spacing:.15em;font-size:clamp(.8rem,.95vw,1rem);padding:clamp(12px,1.2vw,18px) clamp(36px,4vw,64px);">Me Contacter</a>
+  </div>
+</section>
+
+<footer style="text-align:center;padding:clamp(20px,3vw,40px);border-top:1px solid rgba(255,255,255,.06);opacity:.3;font-size:clamp(.7rem,.85vw,.8rem);text-transform:uppercase;letter-spacing:.1em;">
+  © 2026 Mathis — Développeur IA / Auditeur IA
+</footer>
+<script>
+  const PI = window.PROJECT_IMGS || {};
+  document.getElementById('img-p3-main').src = PI['p3-main'] || 'project-images/p3-main.png';
+  document.getElementById('img-p3-code').src = PI['p3-code'] || 'project-images/p3-code.png';
+  document.getElementById('img-p3-tree').src = PI['p3-tree'] || 'project-images/p3-tree.png';
+</script>
+<style>
+  @media (max-width:600px) {
+    .responsive-grid { grid-template-columns: 1fr !important; }
+  }
+</style>
+</body>
+</html>

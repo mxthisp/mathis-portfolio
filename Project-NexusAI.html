@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NexusAI Platform — Mathis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: #0a0015; color: #D7E2EA; font-family: 'Kanit', sans-serif; overflow-x: clip; }
+
+    .hero-heading {
+      background: linear-gradient(180deg, #b400ff 0%, #00dcff 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(32px); } to { opacity:1; transform:translateY(0); } }
+    .fade { opacity: 0; animation: fadeUp .7s cubic-bezier(.25,.1,.25,1) forwards; }
+
+    /* Neon glow for accent elements */
+    .neon { text-shadow: 0 0 18px #b400ff, 0 0 40px rgba(180,0,255,.4); }
+    .neon-cyan { text-shadow: 0 0 12px #00dcff, 0 0 30px rgba(0,220,255,.3); }
+
+    /* Grid bg */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image: linear-gradient(rgba(120,0,255,.06) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(120,0,255,.06) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* Floating orbs */
+    .orb {
+      position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
+      filter: blur(80px);
+    }
+
+    section, nav, footer { position: relative; z-index: 1; }
+
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(180,0,255,.12); border: 1px solid rgba(180,0,255,.35);
+      border-radius: 9999px; padding: 4px 14px;
+      font-size: clamp(.7rem,.9vw,.85rem); font-weight: 500; text-transform: uppercase; letter-spacing: .1em;
+      color: #d088ff;
+    }
+
+    .tech-tag {
+      background: rgba(0,220,255,.08); border: 1px solid rgba(0,220,255,.25);
+      border-radius: 8px; padding: 6px 14px;
+      font-size: clamp(.7rem,.85vw,.8rem); font-weight: 400; letter-spacing: .06em;
+      color: rgba(0,220,255,.9);
+    }
+
+    .feature-card {
+      background: rgba(255,255,255,.03); border: 1px solid rgba(180,0,255,.15);
+      border-radius: 16px; padding: clamp(20px,2vw,32px);
+      transition: border-color .3s, background .3s;
+    }
+    .feature-card:hover { border-color: rgba(180,0,255,.45); background: rgba(180,0,255,.06); }
+
+    .stat-card {
+      background: rgba(0,220,255,.05); border: 1px solid rgba(0,220,255,.2);
+      border-radius: 16px; padding: clamp(20px,2vw,32px); text-align: center;
+    }
+
+    img { display: block; width: 100%; object-fit: cover; }
+  </style>
+  <script src="project-images.js"></script>
+</head>
+<body>
+
+<!-- Orbs -->
+<div class="orb" style="width:600px;height:600px;background:rgba(180,0,255,.18);top:-200px;left:-200px;"></div>
+<div class="orb" style="width:500px;height:500px;background:rgba(0,220,255,.12);bottom:-100px;right:-150px;"></div>
+
+<!-- NAV -->
+<nav style="display:flex;justify-content:space-between;align-items:center;padding:clamp(16px,2vw,28px) clamp(20px,4vw,60px);border-bottom:1px solid rgba(255,255,255,.06);">
+  <a href="Portfolio.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:#D7E2EA;font-weight:500;font-size:clamp(.8rem,1.2vw,1rem);text-transform:uppercase;letter-spacing:.1em;opacity:.7;transition:opacity .2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.7'">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg>
+    Retour
+  </a>
+  <span style="font-weight:700;font-size:clamp(.85rem,1.2vw,1rem);text-transform:uppercase;letter-spacing:.12em;opacity:.5;">Mathis — Portfolio</span>
+  <a href="Portfolio.html#contact" style="text-decoration:none;background:linear-gradient(123deg,#010A1F,#0044FF,#00BFFF,#6B21A8);border-radius:9999px;color:white;font-family:Kanit,sans-serif;font-weight:500;text-transform:uppercase;letter-spacing:.12em;font-size:clamp(.7rem,.85vw,.85rem);padding:8px 24px;border:none;cursor:pointer;">Contact</a>
+</nav>
+
+<!-- HERO -->
+<header style="padding:clamp(60px,8vw,120px) clamp(20px,4vw,60px) clamp(40px,5vw,80px);">
+  <div class="fade" style="animation-delay:.05s;margin-bottom:20px;">
+    <span class="chip">Client · 2024</span>
+  </div>
+  <h1 class="hero-heading fade" style="font-weight:900;text-transform:uppercase;letter-spacing:-.02em;line-height:1;font-size:clamp(3rem,10vw,120px);animation-delay:.1s;">
+    NexusAI<br/>Platform
+  </h1>
+  <p class="fade" style="margin-top:clamp(16px,2vw,28px);max-width:560px;font-weight:300;line-height:1.7;font-size:clamp(.9rem,1.4vw,1.15rem);opacity:.7;animation-delay:.2s;">
+    Plateforme IA de nouvelle génération combinant LLM, mémoire long-terme et agents autonomes pour transformer les workflows d'entreprise.
+  </p>
+
+  <!-- Stats -->
+  <div class="fade" style="display:flex;gap:clamp(12px,2vw,24px);flex-wrap:wrap;margin-top:clamp(36px,4vw,64px);animation-delay:.3s;">
+    <div class="stat-card" style="flex:1;min-width:140px;">
+      <div class="neon-cyan" style="font-size:clamp(1.8rem,4vw,3.5rem);font-weight:900;color:#00dcff;">98.2%</div>
+      <div style="font-size:clamp(.75rem,.9vw,.85rem);text-transform:uppercase;letter-spacing:.1em;opacity:.5;margin-top:4px;">Précision</div>
+    </div>
+    <div class="stat-card" style="flex:1;min-width:140px;">
+      <div class="neon-cyan" style="font-size:clamp(1.8rem,4vw,3.5rem);font-weight:900;color:#00dcff;">12ms</div>
+      <div style="font-size:clamp(.75rem,.9vw,.85rem);text-transform:uppercase;letter-spacing:.1em;opacity:.5;margin-top:4px;">Latence</div>
+    </div>
+    <div class="stat-card" style="flex:1;min-width:140px;">
+      <div class="neon-cyan" style="font-size:clamp(1.8rem,4vw,3.5rem);font-weight:900;color:#00dcff;">×4.5</div>
+      <div style="font-size:clamp(.75rem,.9vw,.85rem);text-transform:uppercase;letter-spacing:.1em;opacity:.5;margin-top:4px;">Productivité</div>
+    </div>
+    <div class="stat-card" style="flex:1;min-width:140px;">
+      <div class="neon-cyan" style="font-size:clamp(1.8rem,4vw,3.5rem);font-weight:900;color:#00dcff;">99.9%</div>
+      <div style="font-size:clamp(.75rem,.9vw,.85rem);text-transform:uppercase;letter-spacing:.1em;opacity:.5;margin-top:4px;">Uptime</div>
+    </div>
+  </div>
+</header>
+
+<!-- IMAGES -->
+<section style="padding:0 clamp(20px,4vw,60px) clamp(40px,5vw,80px);">
+  <div class="fade" style="animation-delay:.35s;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;gap:clamp(10px,1.5vw,20px);">
+    <img id="img-p1-main" alt="NexusAI main" style="grid-column:1/3;border-radius:20px;max-height:500px;"/>
+    <img id="img-p1-code" alt="NexusAI code" style="border-radius:16px;max-height:240px;"/>
+    <img id="img-p1-nodes" alt="NexusAI nodes" style="border-radius:16px;max-height:240px;"/>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section style="padding:clamp(40px,5vw,80px) clamp(20px,4vw,60px);">
+  <div style="max-width:900px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,5vw,80px);align-items:start;" class="responsive-grid">
+    <div class="fade" style="animation-delay:.1s;">
+      <h2 style="font-weight:900;text-transform:uppercase;font-size:clamp(1.8rem,3.5vw,3rem);letter-spacing:-.01em;margin-bottom:clamp(16px,2vw,24px);">Le Projet</h2>
+      <p style="font-weight:300;line-height:1.8;font-size:clamp(.85rem,1.3vw,1.05rem);opacity:.7;margin-bottom:16px;">
+        NexusAI est une plateforme d'intelligence artificielle développée pour un client du secteur financier, visant à automatiser l'analyse de données complexes et la prise de décision.
+      </p>
+      <p style="font-weight:300;line-height:1.8;font-size:clamp(.85rem,1.3vw,1.05rem);opacity:.7;">
+        L'architecture repose sur un réseau d'agents autonomes orchestrés par un LLM fine-tuné, capable d'analyser des milliers de documents en temps réel et de générer des insights actionnables.
+      </p>
+    </div>
+    <div class="fade" style="animation-delay:.2s;">
+      <h3 style="font-weight:700;text-transform:uppercase;font-size:clamp(1rem,1.5vw,1.2rem);letter-spacing:.08em;margin-bottom:clamp(12px,1.5vw,20px);opacity:.6;">Technologies</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <span class="tech-tag">Python</span><span class="tech-tag">LangChain</span>
+        <span class="tech-tag">GPT-4o</span><span class="tech-tag">FastAPI</span>
+        <span class="tech-tag">Pinecone</span><span class="tech-tag">Redis</span>
+        <span class="tech-tag">Docker</span><span class="tech-tag">AWS</span>
+        <span class="tech-tag">RAG</span><span class="tech-tag">Fine-tuning</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section style="padding:clamp(40px,5vw,80px) clamp(20px,4vw,60px);">
+  <div style="max-width:900px;margin:0 auto;">
+    <h2 class="fade" style="font-weight:900;text-transform:uppercase;font-size:clamp(1.8rem,3.5vw,3rem);letter-spacing:-.01em;margin-bottom:clamp(28px,3vw,48px);animation-delay:.1s;">Fonctionnalités</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:clamp(12px,1.5vw,20px);">
+      <div class="feature-card fade" style="animation-delay:.15s;">
+        <div style="font-size:1.8rem;margin-bottom:12px;">🧠</div>
+        <h4 style="font-weight:700;font-size:clamp(.95rem,1.3vw,1.1rem);margin-bottom:8px;">Agents Autonomes</h4>
+        <p style="font-weight:300;opacity:.6;font-size:clamp(.8rem,1.1vw,.95rem);line-height:1.6;">Réseau d'agents LLM capables de planifier, déléguer et exécuter des tâches complexes sans supervision.</p>
+      </div>
+      <div class="feature-card fade" style="animation-delay:.2s;">
+        <div style="font-size:1.8rem;margin-bottom:12px;">💾</div>
+        <h4 style="font-weight:700;font-size:clamp(.95rem,1.3vw,1.1rem);margin-bottom:8px;">Mémoire Long-terme</h4>
+        <p style="font-weight:300;opacity:.6;font-size:clamp(.8rem,1.1vw,.95rem);line-height:1.6;">Architecture RAG avec base vectorielle Pinecone pour contextualiser chaque interaction sur l'historique complet.</p>
+      </div>
+      <div class="feature-card fade" style="animation-delay:.25s;">
+        <div style="font-size:1.8rem;margin-bottom:12px;">⚡</div>
+        <h4 style="font-weight:700;font-size:clamp(.95rem,1.3vw,1.1rem);margin-bottom:8px;">Temps Réel</h4>
+        <p style="font-weight:300;opacity:.6;font-size:clamp(.8rem,1.1vw,.95rem);line-height:1.6;">Pipeline de traitement asynchrone avec latence sub-15ms pour les requêtes critiques via cache Redis.</p>
+      </div>
+      <div class="feature-card fade" style="animation-delay:.3s;">
+        <div style="font-size:1.8rem;margin-bottom:12px;">🔒</div>
+        <h4 style="font-weight:700;font-size:clamp(.95rem,1.3vw,1.1rem);margin-bottom:8px;">Sécurité RGPD</h4>
+        <p style="font-weight:300;opacity:.6;font-size:clamp(.8rem,1.1vw,.95rem);line-height:1.6;">Chiffrement de bout en bout, audit logs et anonymisation automatique des données sensibles.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section style="padding:clamp(60px,8vw,120px) clamp(20px,4vw,60px);text-align:center;">
+  <h2 class="hero-heading fade" style="font-weight:900;text-transform:uppercase;font-size:clamp(2rem,6vw,72px);letter-spacing:-.02em;margin-bottom:24px;animation-delay:.1s;">Un projet similaire ?</h2>
+  <p class="fade" style="opacity:.6;font-weight:300;font-size:clamp(.9rem,1.4vw,1.1rem);margin-bottom:36px;animation-delay:.2s;">Discutons de votre vision IA</p>
+  <div class="fade" style="animation-delay:.3s;">
+    <a href="Portfolio.html#contact" style="text-decoration:none;display:inline-block;background:linear-gradient(123deg,#010A1F,#b400ff,#7621B0,#BE4C00);box-shadow:0 4px 4px rgba(181,1,167,.25),inset 4px 4px 12px #7721B1;outline:2px solid white;outline-offset:-3px;border-radius:9999px;color:white;font-family:Kanit,sans-serif;font-weight:500;text-transform:uppercase;letter-spacing:.15em;font-size:clamp(.8rem,.95vw,1rem);padding:clamp(12px,1.2vw,18px) clamp(36px,4vw,64px);">Me Contacter</a>
+  </div>
+</section>
+
+<footer style="text-align:center;padding:clamp(20px,3vw,40px);border-top:1px solid rgba(255,255,255,.06);opacity:.3;font-size:clamp(.7rem,.85vw,.8rem);text-transform:uppercase;letter-spacing:.1em;">
+  © 2026 Mathis — Développeur IA / Auditeur IA
+</footer>
+<script>
+  const PI = window.PROJECT_IMGS || {};
+  document.getElementById('img-p1-main').src  = PI['p1-main']  || 'project-images/p1-main.png';
+  document.getElementById('img-p1-code').src  = PI['p1-code']  || 'project-images/p1-code.png';
+  document.getElementById('img-p1-nodes').src = PI['p1-nodes'] || 'project-images/p1-nodes.png';
+</script>
+
+<style>
+  @media (max-width:600px) {
+    .responsive-grid { grid-template-columns: 1fr !important; }
+  }
+</style>
+</body>
+</html>
