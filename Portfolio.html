@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mathis — Développeur IA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="project-images.js"></script>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    html, body, #root { background: #0C0C0C; font-family: 'Kanit', sans-serif; }
+    body { overflow-x: clip; }
+    .hero-heading {
+      background: linear-gradient(180deg, #646973 0%, #BBCCD7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .portrait-wrap {
+      position: absolute; left: 50%; z-index: 10;
+      width: clamp(200px, 30vw, 500px);
+      top: 50%; transform: translateX(-50%) translateY(-50%);
+    }
+    @media (min-width: 640px) {
+      .portrait-wrap { top: auto; bottom: 0; transform: translateX(-50%); }
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback, createContext, useContext } = React;
+
+/* ─── ACCENT PRESETS ─────────────────────────────────────────── */
+const ACCENTS = {
+  blue:    { grad: 'linear-gradient(123deg,#010A1F 7%,#0044FF 37%,#00BFFF 72%,#6B21A8 100%)', shadow: '0 4px 4px rgba(0,68,255,.25),inset 4px 4px 12px #0044FF' },
+  purple:  { grad: 'linear-gradient(123deg,#18011F 7%,#B600A8 37%,#7621B0 72%,#BE4C00 100%)', shadow: '0 4px 4px rgba(181,1,167,.25),inset 4px 4px 12px #7721B1' },
+  emerald: { grad: 'linear-gradient(123deg,#01150A 7%,#00A878 37%,#00D4AA 72%,#2B6BAB 100%)', shadow: '0 4px 4px rgba(0,168,120,.25),inset 4px 4px 12px #00A878' },
+};
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accent": "blue",
+  "roundedCards": true
+}/*EDITMODE-END*/;
+const TweaksCtx = createContext(TWEAK_DEFAULTS);
+
+/* ─── FADE IN ────────────────────────────────────────────────── */
+function FadeIn({ children, delay=0, duration=0.7, x=0, y=30, style:sp={}, className='' }) {
+  const ref = useRef(null);
+  const [vis, setVis] = useState(false);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const obs = new IntersectionObserver(([e]) => {
+      setVis(e.isIntersecting);
+    }, { rootMargin:'-40px 0px -40px 0px', threshold:0.05 });
+    obs.observe(el); return () => obs.disconnect();
+  }, []);
+  return (
+    <div ref={ref} className={className} style={{ opacity: vis?1:0, transform: vis?'translate(0,0)':`translate(${x}px,${y}px)`, transition:`opacity ${duration}s cubic-bezier(.25,.1,.25,1) ${delay}s,transform ${duration}s cubic-bezier(.25,.1,.25,1) ${delay}s`, ...sp }}>
+      {children}
+    </div>
+  );
+}
+
+/* ─── MAGNET ─────────────────────────────────────────────────── */
+function Magnet({ children, padding=150, strength=3 }) {
+  const ref = useRef(null);
+  const [tf, setTf] = useState({ v:'none', on:false });
+  useEffect(() => {
+    const mv = e => {
+      if (!ref.current) return;
+      const r = ref.current.getBoundingClientRect();
+      const dx = e.clientX-(r.left+r.width/2), dy = e.clientY-(r.top+r.height/2);
+      const d = Math.sqrt(dx*dx+dy*dy), thresh = Math.max(r.width,r.height)/2+padding;
+      if (d < thresh) setTf({ v:`translate3d(${dx/strength}px,${dy/strength}px,0)`, on:true });
+      else setTf(p => p.on ? { v:'none', on:false } : p);
+    };
+    window.addEventListener('mousemove', mv); return () => window.removeEventListener('mousemove', mv);
+  }, [padding, strength]);
+  return <div ref={ref} style={{ transform:tf.v, transition:tf.on?'transform .3s ease-out':'transform .6s ease-in-out', willChange:'transform' }}>{children}</div>;
+}
+
+/* ─── CONTACT BUTTON ─────────────────────────────────────────── */
+function ContactButton({ label='Me Contacter' }) {
+  const { accent } = useContext(TweaksCtx);
+  const a = ACCENTS[accent] || ACCENTS.blue;
+  return (
+    <a href="#contact" style={{ textDecoration:'none' }}>
+      <button style={{ background:a.grad, boxShadow:a.shadow, outline:'2px solid white', outlineOffset:'-3px', borderRadius:'9999px', color:'white', fontFamily:'Kanit,sans-serif', fontWeight:500, textTransform:'uppercase', letterSpacing:'.15em', cursor:'pointer', border:'none', padding:'clamp(10px,1.2vw,16px) clamp(24px,3vw,48px)', fontSize:'clamp(.75rem,.9vw,1rem)' }}>
+        {label}
+      </button>
+    </a>
+  );
+}
+
+/* ─── ANIMATED TEXT ──────────────────────────────────────────── */
+function AnimatedText({ text, style:sp={}, className='' }) {
+  const ref = useRef(null);
+  const [prog, setProg] = useState(0);
+  useEffect(() => {
+    const fn = () => {
+      if (!ref.current) return;
+      const r = ref.current.getBoundingClientRect(), wh = window.innerHeight;
+      const s = r.top - wh*.8, e = r.bottom - wh*.2;
+      setProg(Math.max(0, Math.min(1, -s/(e-s))));
+    };
+    window.addEventListener('scroll', fn, { passive:true }); fn();
+    return () => window.removeEventListener('scroll', fn);
+  }, []);
+  return (
+    <p ref={ref} className={className} style={sp}>
+      {text.split('').map((c,i) => <span key={i} style={{ opacity: 0.2+Math.max(0,Math.min(1,prog*text.length-i))*.8 }}>{c}</span>)}
+    </p>
+  );
+}
+
+/* ─── AVATAR ─────────────────────────────────────────────────── */
+function AvatarSlot() {
+  return (
+    <div style={{ width:'100%', position:'relative' }}>
+      <img
+        src="uploads/c692ef23-9275-474c-88e0-34bd6a67355e-removebg-preview.png"
+        alt="Mathis"
+        style={{ width:'100%', display:'block', objectFit:'contain' }}
+      />
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HERO SECTION
+═══════════════════════════════════════════════════════════════ */
+const NAV = [
+  { label:'À Propos', href:'#apropos' },
+  { label:'Services',  href:'#services' },
+  { label:'Projets',   href:'#projets'  },
+  { label:'Contact',   href:'#contact'  },
+];
+
+function HeroSection() {
+  return (
+    <section style={{ background:'#0C0C0C', height:'100vh', display:'flex', flexDirection:'column', position:'relative', overflowX:'clip' }}>
+      <FadeIn delay={0} y={-20}>
+        <nav style={{ display:'flex', justifyContent:'space-between', padding:'clamp(18px,2.5vw,32px) clamp(20px,4vw,40px) 0' }}>
+          {NAV.map(({ label, href }) => (
+            <a key={label} href={href} style={{ color:'#D7E2EA', fontWeight:500, textTransform:'uppercase', letterSpacing:'.1em', fontSize:'clamp(.75rem,1.2vw,1.4rem)', textDecoration:'none', transition:'opacity .2s' }}
+              onMouseEnter={e=>e.currentTarget.style.opacity='.6'} onMouseLeave={e=>e.currentTarget.style.opacity='1'}>{label}</a>
+          ))}
+        </nav>
+      </FadeIn>
+
+      <div style={{ overflow:'hidden' }}>
+        <FadeIn delay={0.15} y={40}>
+          <h1 className="hero-heading" style={{ fontWeight:900, textTransform:'uppercase', letterSpacing:'-.02em', lineHeight:1, whiteSpace:'nowrap', width:'100%', fontSize:'clamp(11vw,17.5vw,17.5vw)', marginTop:'clamp(-16px,.5vw,8px)', paddingLeft:'clamp(12px,2vw,24px)' }}>
+            Hi, i&apos;m mathis
+          </h1>
+        </FadeIn>
+      </div>
+
+      <div className="portrait-wrap">
+        <FadeIn delay={0.6} y={30}>
+          <Magnet padding={150} strength={3}><AvatarSlot /></Magnet>
+        </FadeIn>
+      </div>
+
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end', padding:'0 clamp(20px,4vw,40px) clamp(18px,2.5vw,40px)', marginTop:'auto' }}>
+        <FadeIn delay={0.35} y={20}>
+          <p style={{ color:'#D7E2EA', fontWeight:300, textTransform:'uppercase', letterSpacing:'.06em', lineHeight:1.35, maxWidth:'clamp(140px,15vw,260px)', fontSize:'clamp(.7rem,1.3vw,1.4rem)' }}>
+            développeur IA passionné par l&apos;innovation et l&apos;automatisation
+          </p>
+        </FadeIn>
+        <FadeIn delay={0.5} y={20}><ContactButton /></FadeIn>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MARQUEE SECTION
+═══════════════════════════════════════════════════════════════ */
+const R1 = ['hero-space-voyage-preview-eECLH3Yc','hero-codenest-preview-Cgppc2qV','hero-vex-ventures-preview-BczMFIiw','hero-stellar-ai-v2-preview-DjvxjG3C','hero-asme-preview-B_nGDnTP','hero-transform-data-preview-Cx5OU29N','hero-vitara-preview-Cjz2QYyU','hero-terra-preview-BFjrCr7T','hero-skyelite-preview-DHaZIgUv','hero-aethera-preview-DknSlcTa','hero-designpro-preview-D8c5_een'].map(n=>`https://motionsites.ai/assets/${n}.gif`);
+const R2 = ['hero-stellar-ai-preview-D3HL6bw1','hero-xportfolio-preview-D4A8maiC','hero-orbit-web3-preview-BXt4OttD','hero-nexora-preview-cx5HmUgo','hero-evr-ventures-preview-DZxeVFEX','hero-planet-orbit-preview-DWAP8Z1P','hero-new-era-preview-CocuDUm9','hero-wealth-preview-B70idl_u','hero-luminex-preview-CxOP7ce6','hero-celestia-preview-0yO3jXO8'].map(n=>`https://motionsites.ai/assets/${n}.gif`);
+
+function MarqueeSection() {
+  const secRef = useRef(null);
+  const [offset, setOffset] = useState(200);
+  useEffect(() => {
+    const fn = () => {
+      if (!secRef.current) return;
+      const top = secRef.current.getBoundingClientRect().top + window.scrollY;
+      setOffset((window.scrollY - top + window.innerHeight) * 0.3);
+    };
+    window.addEventListener('scroll', fn, { passive:true }); fn();
+    return () => window.removeEventListener('scroll', fn);
+  }, []);
+  const row1 = [...R1,...R1,...R1], row2 = [...R2,...R2,...R2];
+  const img = { width:'420px', height:'270px', borderRadius:'16px', objectFit:'cover', flexShrink:0 };
+  return (
+    <section ref={secRef} style={{ background:'#0C0C0C', padding:'clamp(80px,10vw,160px) 0 40px', overflow:'hidden' }}>
+      <div style={{ display:'flex', gap:'12px', marginBottom:'12px', willChange:'transform', transform:`translateX(${offset-200}px)` }}>
+        {row1.map((s,i) => <img key={i} src={s} alt="" loading="lazy" style={img} />)}
+      </div>
+      <div style={{ display:'flex', gap:'12px', willChange:'transform', transform:`translateX(${-(offset-200)}px)` }}>
+        {row2.map((s,i) => <img key={i} src={s} alt="" loading="lazy" style={img} />)}
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ABOUT SECTION
+═══════════════════════════════════════════════════════════════ */
+const ABOUT = "Fort de plusieurs années d'expérience dans l'intelligence artificielle, je me spécialise dans l'audit IA, l'automatisation de processus et le développement de solutions sur mesure. J'accompagne les entreprises à intégrer l'IA de manière efficace, éthique et performante. Construisons ensemble quelque chose d'intelligent !";
+
+const DECO = [
+  { src:'https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/moon_icon.11395d36.png', s:{ top:'4%',left:'clamp(8px,4%,60px)' }, delay:.1, x:-80 },
+  { src:'https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/p59_1.4659672e.png', s:{ bottom:'8%',left:'clamp(8px,10%,120px)' }, delay:.25, x:-80 },
+  { src:'https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/lego_icon-1.703bb594.png', s:{ top:'4%',right:'clamp(8px,4%,60px)' }, delay:.15, x:80 },
+  { src:'https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/Group_134-1.2e04f3ce.png', s:{ bottom:'8%',right:'clamp(8px,10%,120px)' }, delay:.3, x:80 },
+];
+
+function AboutSection() {
+  return (
+    <section id="apropos" style={{ background:'#0C0C0C', minHeight:'100vh', position:'relative', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'80px clamp(20px,4vw,40px)' }}>
+      {DECO.map((d,i) => (
+        <FadeIn key={i} delay={d.delay} x={d.x} y={0} duration={0.9} style={{ position:'absolute', width:'clamp(80px,12vw,200px)', ...d.s }}>
+          <img src={d.src} alt="" style={{ width:'100%', pointerEvents:'none', userSelect:'none' }} />
+        </FadeIn>
+      ))}
+      <FadeIn delay={0} y={40}>
+        <h2 className="hero-heading" style={{ fontWeight:900, textTransform:'uppercase', letterSpacing:'-.02em', lineHeight:1, textAlign:'center', fontSize:'clamp(3rem,12vw,160px)', marginBottom:'clamp(32px,4vw,64px)' }}>À Propos</h2>
+      </FadeIn>
+      <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'clamp(40px,5vw,80px)' }}>
+        <AnimatedText text={ABOUT} style={{ color:'#D7E2EA', fontWeight:500, textAlign:'center', lineHeight:1.65, maxWidth:'560px', fontSize:'clamp(1rem,1.8vw,1.35rem)' }} />
+        <FadeIn delay={0.3} y={20}><ContactButton /></FadeIn>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SERVICES SECTION
+═══════════════════════════════════════════════════════════════ */
+const SVCS = [
+  { n:'01', name:'Audit IA', desc:"Analyse complète de vos systèmes d'IA — performance, biais, conformité RGPD et robustesse — pour garantir des solutions responsables, fiables et optimisées." },
+  { n:'02', name:'Automatisation IA', desc:"Conception et déploiement de workflows intelligents pour automatiser vos processus métier, réduire les coûts et libérer votre équipe des tâches répétitives." },
+  { n:'03', name:'Création de Site Web', desc:"Développement de sites modernes, rapides et orientés conversion, intégrant les dernières technologies pour une expérience utilisateur mémorable." },
+  { n:'04', name:'Développement IA', desc:"Création d'agents IA, chatbots et modèles personnalisés adaptés à vos besoins — de la conception au déploiement en production." },
+  { n:'05', name:'Conseil Stratégique', desc:"Accompagnement sur mesure pour définir votre roadmap IA, former vos équipes et déployer une vision technologique cohérente et ambitieuse." },
+];
+
+function ServicesSection() {
+  return (
+    <section id="services" style={{ background:'#FFF', borderRadius:'60px 60px 0 0', padding:'clamp(48px,6vw,120px) clamp(20px,4vw,40px)' }}>
+      <FadeIn delay={0} y={30}>
+        <h2 style={{ fontWeight:900, textTransform:'uppercase', textAlign:'center', letterSpacing:'-.02em', fontSize:'clamp(3rem,12vw,160px)', color:'#0C0C0C', lineHeight:1, marginBottom:'clamp(40px,5vw,112px)' }}>Services</h2>
+      </FadeIn>
+      <div style={{ maxWidth:'900px', margin:'0 auto' }}>
+        {SVCS.map((s,i) => (
+          <FadeIn key={i} delay={i*.1} y={20}>
+            <div style={{ display:'flex', gap:'clamp(16px,3vw,48px)', alignItems:'flex-start', borderTop: i===0?'1px solid rgba(12,12,12,.12)':'none', borderBottom:'1px solid rgba(12,12,12,.12)', padding:'clamp(20px,2.5vw,48px) 0' }}>
+              <span style={{ fontWeight:900, fontSize:'clamp(2rem,7vw,120px)', color:'#0C0C0C', lineHeight:1, flexShrink:0, minWidth:'clamp(52px,8vw,140px)', opacity:.12 }}>{s.n}</span>
+              <div style={{ paddingTop:'clamp(2px,.3vw,12px)' }}>
+                <div style={{ fontWeight:600, textTransform:'uppercase', fontSize:'clamp(1rem,2.2vw,2rem)', color:'#0C0C0C', marginBottom:'6px' }}>{s.name}</div>
+                <div style={{ fontWeight:300, lineHeight:1.65, maxWidth:'640px', fontSize:'clamp(.85rem,1.5vw,1.2rem)', opacity:.6, color:'#0C0C0C' }}>{s.desc}</div>
+              </div>
+            </div>
+          </FadeIn>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PROJECTS SECTION
+═══════════════════════════════════════════════════════════════ */
+const PROJS = [
+  /* Style : Cyberpunk / Néon / Abstrait */
+  { num:'01', name:'NexusAI Platform', cat:'Client',
+    c1a: window.PROJECT_IMGS?.['p1-code']   || 'project-images/p1-code.png',
+    c1b: window.PROJECT_IMGS?.['p1-nodes']  || 'project-images/p1-nodes.png',
+    c2:  window.PROJECT_IMGS?.['p1-main']   || 'project-images/p1-main.png',
+    href:'Project-NexusAI.html' },
+  /* Style : Dashboard / Data viz */
+  { num:'02', name:'AutoSync Pro', cat:'Personnel',
+    c1a: window.PROJECT_IMGS?.['p2-bar']    || 'project-images/p2-bar.png',
+    c1b: window.PROJECT_IMGS?.['p2-pie']    || 'project-images/p2-pie.png',
+    c2:  window.PROJECT_IMGS?.['p2-main']   || 'project-images/p2-main.png',
+    href:'Project-AutoSync.html' },
+  /* Style : Minimaliste / Code terminal */
+  { num:'03', name:'Quantis Assistant', cat:'Client',
+    c1a: window.PROJECT_IMGS?.['p3-code']   || 'project-images/p3-code.png',
+    c1b: window.PROJECT_IMGS?.['p3-tree']   || 'project-images/p3-tree.png',
+    c2:  window.PROJECT_IMGS?.['p3-main']   || 'project-images/p3-main.png',
+    href:'Project-Quantis.html' },
+];
+
+function ProjectCard({ project, index, total }) {
+  const { roundedCards } = useContext(TweaksCtx);
+  const cRef = useRef(null);
+  const [scale, setScale] = useState(1);
+  const targetScale = 1 - (total-1-index)*0.03;
+  const stickyTop = 96 + index*28;
+  const br = roundedCards ? 'clamp(20px,3.5vw,60px)' : '12px';
+
+  useEffect(() => {
+    const fn = () => {
+      if (!cRef.current) return;
+      const r = cRef.current.getBoundingClientRect(), wh = window.innerHeight;
+      const scrolled = -r.top, tot = r.height - wh;
+      if (tot > 0) setScale(1 - Math.max(0,Math.min(1,scrolled/tot))*(1-targetScale));
+    };
+    window.addEventListener('scroll', fn, { passive:true }); fn();
+    return () => window.removeEventListener('scroll', fn);
+  }, [targetScale]);
+
+  return (
+    <div ref={cRef} style={{ height:'85vh' }}>
+      <div style={{ position:'sticky', top:`${stickyTop}px`, transform:`scale(${scale})`, transformOrigin:'top center', willChange:'transform', border:'2px solid #D7E2EA', borderRadius:br, background:'#0C0C0C', padding:'clamp(12px,1.5vw,28px)', overflow:'hidden' }}>
+        <div style={{ display:'flex', alignItems:'center', gap:'clamp(8px,1.5vw,20px)', marginBottom:'clamp(10px,1.2vw,20px)', flexWrap:'wrap' }}>
+          <span style={{ fontWeight:900, fontSize:'clamp(2rem,6vw,100px)', color:'#D7E2EA', lineHeight:1, opacity:.15 }}>{project.num}</span>
+          <span style={{ fontWeight:300, textTransform:'uppercase', letterSpacing:'.12em', color:'#D7E2EA', fontSize:'clamp(.65rem,.85vw,.9rem)', opacity:.6 }}>{project.cat}</span>
+          <span style={{ fontWeight:700, textTransform:'uppercase', letterSpacing:'-.01em', color:'#D7E2EA', fontSize:'clamp(.9rem,1.8vw,1.8rem)', flex:1 }}>{project.name}</span>
+          <a href={project.href} style={{ textDecoration:'none' }}><button style={{ borderRadius:'9999px', border:'2px solid #D7E2EA', color:'#D7E2EA', background:'transparent', cursor:'pointer', fontFamily:'Kanit,sans-serif', fontWeight:500, textTransform:'uppercase', letterSpacing:'.1em', padding:'clamp(6px,.6vw,10px) clamp(14px,1.5vw,24px)', fontSize:'clamp(.65rem,.75vw,.85rem)' }}>Voir le Projet</button></a>
+        </div>
+        <div style={{ display:'flex', gap:'clamp(6px,1vw,12px)', height:'clamp(260px,36vw,540px)' }}>
+          <div style={{ flex:'0 0 40%', display:'flex', flexDirection:'column', gap:'clamp(6px,1vw,12px)' }}>
+            <img src={project.c1a} alt="" loading="eager" style={{ flex:'0 0 clamp(90px,14vw,210px)', width:'100%', objectFit:'cover', borderRadius:br }} />
+            <img src={project.c1b} alt="" loading="eager" style={{ flex:1, width:'100%', objectFit:'cover', borderRadius:br }} />
+          </div>
+          <img src={project.c2} alt="" loading="eager" style={{ flex:'0 0 60%', height:'100%', objectFit:'cover', borderRadius:br }} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProjectsSection() {
+  return (
+    <section id="projets" style={{ background:'#0C0C0C', borderRadius:'60px 60px 0 0', marginTop:'-56px', position:'relative', zIndex:10, padding:'clamp(36px,4vw,72px) clamp(20px,4vw,40px)' }}>
+      <FadeIn delay={0} y={40}>
+        <h2 className="hero-heading" style={{ fontWeight:900, textTransform:'uppercase', letterSpacing:'-.02em', lineHeight:1, textAlign:'center', fontSize:'clamp(3rem,12vw,160px)', marginBottom:'clamp(24px,3vw,48px)' }}>Projets</h2>
+      </FadeIn>
+      {PROJS.map((p,i) => <ProjectCard key={i} project={p} index={i} total={PROJS.length} />)}
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CONTACT SECTION
+═══════════════════════════════════════════════════════════════ */
+function ContactSection() {
+  const { accent } = useContext(TweaksCtx);
+  const a = ACCENTS[accent] || ACCENTS.blue;
+  const [form, setForm] = useState({ name:'', email:'', message:'' });
+  const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const inputStyle = {
+    width:'100%', background:'rgba(215,226,234,.05)', border:'1px solid rgba(215,226,234,.15)',
+    borderRadius:12, color:'#D7E2EA', fontFamily:'Kanit,sans-serif', fontWeight:300,
+    fontSize:'clamp(.9rem,1.3vw,1.1rem)', padding:'clamp(12px,1.2vw,18px) clamp(14px,1.5vw,22px)',
+    outline:'none', transition:'border-color .2s',
+  };
+
+  const handleSubmit = async e => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch('https://formspree.io/f/xkoervev', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ name: form.name, email: form.email, message: form.message }),
+      });
+      if (res.ok) {
+        setSent(true);
+      } else {
+        setError("Erreur lors de l'envoi. Veuillez réessayer.");
+      }
+    } catch {
+      setError("Erreur réseau. Vérifiez votre connexion.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <section id="contact" style={{ background:'#0C0C0C', borderRadius:'60px 60px 0 0', marginTop:'-56px', position:'relative', zIndex:20, padding:'clamp(48px,6vw,120px) clamp(20px,4vw,40px) clamp(60px,7vw,140px)' }}>
+
+      {/* Big heading */}
+      <FadeIn delay={0} y={40}>
+        <h2 className="hero-heading" style={{ fontWeight:900, textTransform:'uppercase', letterSpacing:'-.02em', lineHeight:1, textAlign:'center', fontSize:'clamp(3rem,12vw,160px)', marginBottom:'clamp(12px,2vw,32px)' }}>Contact</h2>
+      </FadeIn>
+      <FadeIn delay={0.1} y={20}>
+        <p style={{ color:'#D7E2EA', opacity:.5, textAlign:'center', fontWeight:300, fontSize:'clamp(.85rem,1.4vw,1.15rem)', letterSpacing:'.04em', marginBottom:'clamp(40px,5vw,80px)' }}>
+          Un projet, une question, une collaboration ?<br/>Je vous réponds sous 24h.
+        </p>
+      </FadeIn>
+
+      {/* Form */}
+      <FadeIn delay={0.2} y={30}>
+        <div style={{ maxWidth:640, margin:'0 auto' }}>
+          {sent ? (
+            <div style={{ textAlign:'center', padding:'48px 0' }}>
+              <div style={{ fontSize:'3rem', marginBottom:16 }}>✅</div>
+              <p style={{ color:'#D7E2EA', fontWeight:600, fontSize:'clamp(1rem,1.8vw,1.4rem)', marginBottom:8 }}>Message envoyé !</p>
+              <p style={{ color:'#D7E2EA', opacity:.5, fontWeight:300, fontSize:'clamp(.85rem,1.2vw,1rem)' }}>Je vous recontacte très prochainement.</p>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} style={{ display:'flex', flexDirection:'column', gap:'clamp(12px,1.5vw,20px)' }}>
+              <div style={{ display:'flex', gap:'clamp(12px,1.5vw,20px)', flexWrap:'wrap' }}>
+                <input
+                  required placeholder="Votre nom"
+                  value={form.name} onChange={e=>setForm(p=>({...p,name:e.target.value}))}
+                  style={{ ...inputStyle, flex:'1 1 200px' }}
+                  onFocus={e=>e.target.style.borderColor='rgba(215,226,234,.5)'}
+                  onBlur={e=>e.target.style.borderColor='rgba(215,226,234,.15)'}
+                />
+                <input
+                  required type="email" placeholder="Votre email"
+                  value={form.email} onChange={e=>setForm(p=>({...p,email:e.target.value}))}
+                  style={{ ...inputStyle, flex:'1 1 200px' }}
+                  onFocus={e=>e.target.style.borderColor='rgba(215,226,234,.5)'}
+                  onBlur={e=>e.target.style.borderColor='rgba(215,226,234,.15)'}
+                />
+              </div>
+              <textarea
+                required placeholder="Votre message..." rows={5}
+                value={form.message} onChange={e=>setForm(p=>({...p,message:e.target.value}))}
+                style={{ ...inputStyle, resize:'vertical', minHeight:140 }}
+                onFocus={e=>e.target.style.borderColor='rgba(215,226,234,.5)'}
+                onBlur={e=>e.target.style.borderColor='rgba(215,226,234,.15)'}
+              />
+              {error && (
+                <p style={{ color:'#ff6b6b', textAlign:'center', fontSize:'clamp(.8rem,1vw,.95rem)', fontWeight:300 }}>{error}</p>
+              )}
+              <div style={{ display:'flex', justifyContent:'center', paddingTop:'clamp(4px,1vw,12px)' }}>
+                <button type="submit" disabled={loading} style={{ background: loading ? 'rgba(215,226,234,.15)' : a.grad, boxShadow: loading ? 'none' : a.shadow, outline:'2px solid white', outlineOffset:'-3px', borderRadius:'9999px', color:'white', fontFamily:'Kanit,sans-serif', fontWeight:500, textTransform:'uppercase', letterSpacing:'.15em', cursor: loading ? 'not-allowed' : 'pointer', border:'none', padding:'clamp(12px,1.2vw,18px) clamp(36px,4vw,64px)', fontSize:'clamp(.8rem,.95vw,1.05rem)', opacity: loading ? .6 : 1, transition:'all .2s' }}>
+                  {loading ? 'Envoi...' : 'Envoyer'}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+      </FadeIn>
+
+      {/* Social links */}
+      <FadeIn delay={0.35} y={20}>
+        <div style={{ display:'flex', justifyContent:'center', gap:'clamp(16px,2.5vw,40px)', marginTop:'clamp(48px,6vw,96px)', flexWrap:'wrap' }}>
+          {[
+            { label:'LinkedIn', href:'https://www.linkedin.com/in/mathis-paul-82157b2a0/' },
+            { label:'GitHub', href:'https://github.com/mxthisp' },
+            { label:'Twitter / X', href:'https://x.com/AskMathisAI' },
+            { label:'Email', href:'mailto:mathisprof75015@gmail.com' },
+          ].map(({ label, href }) => (
+            <a key={label} href={href} style={{ color:'#D7E2EA', fontWeight:500, textTransform:'uppercase', letterSpacing:'.1em', fontSize:'clamp(.75rem,1.1vw,1rem)', textDecoration:'none', opacity:.45, transition:'opacity .2s' }}
+              onMouseEnter={e=>e.currentTarget.style.opacity='1'}
+              onMouseLeave={e=>e.currentTarget.style.opacity='.45'}>
+              {label}
+            </a>
+          ))}
+        </div>
+      </FadeIn>
+
+      {/* Footer */}
+      <FadeIn delay={0.45} y={10}>
+        <p style={{ color:'#D7E2EA', opacity:.2, textAlign:'center', fontWeight:300, fontSize:'clamp(.7rem,.9vw,.85rem)', letterSpacing:'.08em', marginTop:'clamp(32px,4vw,64px)', textTransform:'uppercase' }}>
+          © 2026 Mathis — Développeur IA / Auditeur IA
+        </p>
+      </FadeIn>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TWEAKS PANEL
+═══════════════════════════════════════════════════════════════ */
+function TweaksFloating({ tweaks, setTweak, visible, onClose }) {
+  if (!visible) return null;
+  const dot = (color, key) => (
+    <button key={key} onClick={()=>setTweak('accent',key)} style={{ width:28, height:28, borderRadius:'50%', background:ACCENTS[key].grad, border: tweaks.accent===key ? '2px solid white':'2px solid rgba(255,255,255,.15)', cursor:'pointer', flexShrink:0 }} />
+  );
+  return (
+    <div style={{ position:'fixed', bottom:24, right:24, zIndex:9999, background:'rgba(14,14,28,.95)', backdropFilter:'blur(12px)', border:'1px solid rgba(215,226,234,.15)', borderRadius:16, padding:'20px 20px', width:220, fontFamily:'Kanit,sans-serif', color:'#D7E2EA', boxShadow:'0 8px 32px rgba(0,0,0,.6)' }}>
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
+        <span style={{ fontWeight:700, fontSize:12, textTransform:'uppercase', letterSpacing:'.12em' }}>Tweaks</span>
+        <button onClick={onClose} style={{ background:'none', border:'none', color:'#D7E2EA', cursor:'pointer', fontSize:16, opacity:.6, lineHeight:1 }}>✕</button>
+      </div>
+      <div style={{ marginBottom:16 }}>
+        <p style={{ fontSize:10, opacity:.5, textTransform:'uppercase', letterSpacing:'.1em', marginBottom:8 }}>Couleur d&apos;accent</p>
+        <div style={{ display:'flex', gap:8 }}>
+          {dot('#0044FF','blue')}{dot('#B600A8','purple')}{dot('#00A878','emerald')}
+        </div>
+      </div>
+      <div>
+        <p style={{ fontSize:10, opacity:.5, textTransform:'uppercase', letterSpacing:'.1em', marginBottom:8 }}>Coins des cartes</p>
+        <div style={{ display:'flex', gap:6 }}>
+          {[['Ronds',true],['Carrés',false]].map(([lbl,val]) => (
+            <button key={lbl} onClick={()=>setTweak('roundedCards',val)} style={{ flex:1, padding:'5px 0', borderRadius:6, border:`1px solid ${tweaks.roundedCards===val?'#D7E2EA':'rgba(215,226,234,.2)'}`, background: tweaks.roundedCards===val ? 'rgba(215,226,234,.1)':'transparent', color:'#D7E2EA', cursor:'pointer', fontFamily:'Kanit,sans-serif', fontSize:11, fontWeight:500, textTransform:'uppercase', letterSpacing:'.06em' }}>{lbl}</button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   APP
+═══════════════════════════════════════════════════════════════ */
+function App() {
+  const [tweaks, setTweaksState] = useState(TWEAK_DEFAULTS);
+  const [tweaksOpen, setTweaksOpen] = useState(false);
+
+  const setTweak = useCallback((key, val) => {
+    setTweaksState(p => {
+      const next = { ...p, [key]: val };
+      window.parent.postMessage({ type:'__edit_mode_set_keys', edits: next }, '*');
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    const h = e => {
+      if (e.data?.type === '__activate_edit_mode') setTweaksOpen(true);
+      if (e.data?.type === '__deactivate_edit_mode') setTweaksOpen(false);
+    };
+    window.addEventListener('message', h);
+    window.parent.postMessage({ type:'__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', h);
+  }, []);
+
+  const onClose = () => { setTweaksOpen(false); window.parent.postMessage({ type:'__edit_mode_dismissed' }, '*'); };
+
+  return (
+    <TweaksCtx.Provider value={tweaks}>
+      <div style={{ background:'#0C0C0C', overflowX:'clip' }}>
+        <HeroSection />
+        <MarqueeSection />
+        <AboutSection />
+        <ServicesSection />
+        <ProjectsSection />
+        <ContactSection />
+        <TweaksFloating tweaks={tweaks} setTweak={setTweak} visible={tweaksOpen} onClose={onClose} />
+      </div>
+    </TweaksCtx.Provider>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
